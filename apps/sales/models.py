@@ -1,7 +1,6 @@
 from decimal import Decimal
 from django.db import models
 
-# Create your models here.
 class Sale(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'), 
@@ -28,7 +27,6 @@ class Sale(models.Model):
     def __str__(self):
         return f"Sale {self.id} ({self.status})"
 
-    
 
 class SaleItem(models.Model):
     sale = models.ForeignKey('sales.Sale', on_delete=models.CASCADE, related_name='items')
