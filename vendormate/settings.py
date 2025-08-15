@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     #apps
     'apps.products',
     'apps.users',
+    'apps.payments',
 ]
 
 AUTH_USER_MODEL = 'users.manageUser'
