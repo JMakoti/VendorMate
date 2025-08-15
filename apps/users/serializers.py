@@ -5,4 +5,4 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
         model = manageUser
-        fields = '__all_'
+        fields = '__all__'
