@@ -1,11 +1,11 @@
-from django.shortcuts import render
 from django.db import transaction
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from .models import Sale
-from .serializers import SaleSerializer
+from .serializers import SaleSerializer, MarkPaidSerializer, CancelSaleSerializer
+from .services import mark_sale_as_paid, cancel_sale
 
 
 class SaleViewSet(viewsets.ModelViewSet):
@@ -25,13 +25,12 @@ class SaleViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='mark-paid')
     def mark_paid(self, request, pk=None):
-        """Mark a sale as paid. To be called by Payments app."""
+        """Mark a sale as paid."""
         sale = self.get_object()
-        if sale.status == 'COMPLETED':
-            return Response({'detail': 'Sale already completed.'}, status=status.HTTP_200_OK)
-        
-        payment_reference = request.data.get('payment_reference')
-        amount = Decimal(request.data.get('amount', '0.00'))
+        serializer = MarkPaidSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        amount = serializer.validated_data.get('amount')
 
         # Ensure amount paid matches the total balance due
         if amount != sale.total_amount:
@@ -40,51 +39,28 @@ class SaleViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
         )
 
-        # Prevent double writing of the same payment reference
-        if payment_reference and sale.payment_reference == payment_reference:
-            return Response({'detail': 'Payment already recorded.'})
-        
-        # Update sale
-        sale.payment_reference = payment_reference
-        sale.status = 'COMPLETED'
-        sale.save(update_fields=['payment_reference', 'status', 'updated_at'])
+        # Call the service layer with a lock
+        with transaction.atomic():
+            sale, response_data, response_status = mark_sale_as_paid(
+                sale=sale,
+                payment_reference=serializer.validated_data.get('payment_reference'),
+                actor=request.user
+            )
 
-        # Record sale paid event
-        SaleEvent.objects.create(
-            sale=sale, 
-            event_type='MARKED_PAID', 
-            payload={'payload': request.data}, 
-            actor=None
-        )
-
-        return Response({'detail': 'Sale marked as completed.'}, status=status.HTTP_200_OK)
+        return Response(response_data, status=response_status)
     
     @action(detail=True, methods=['post'], url_path='cancel')
     def cancel(self, request, pk=None):
-        """Cancel a sale."""
+        """Cancel a sale and restore product stock."""
         sale = self.get_object()
-        if sale.status != 'PENDING':
-            return Response(
-                {'detail': 'Only pending sales can be cancelled.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Restore stock
-        with transaction.atomic():
-            for item in sale.items.select_related('product').all():
-                prod = item.product
-                prod.stock = prod.stock + item.quantity
-                prod.save(update_fields=['stock'])
+        serializer = CancelSaleSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-            sale.status = 'CANCELLED'
-            sale.save(update_fields=['status'])
+        sale, response_data, response_status = cancel_sale(
+            sale=sale,
+            actor=request.user,
+            reason=serializer.validated_data.get('reason')
+        )
 
-            # Record sale cancellation event
-            SaleEvent.objects.create(
-                sale=sale, 
-                event_type='CANCELLED', 
-                payload={'reason': request.data.get('reason')}, 
-                actor=request.user
-            )
 
         return Response({'detail': 'Sale cancelled and stock restored.'}, status=status.HTTP_200_OK)

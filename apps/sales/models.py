@@ -30,7 +30,7 @@ class Sale(models.Model):
 
 class SaleItem(models.Model):
     sale = models.ForeignKey('sales.Sale', on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('products.Product', on_delete=models.PROTECT)
+    product = models.ForeignKey('products.Products', on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     line_total = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal('0.00'))
@@ -52,10 +52,6 @@ class SaleItem(models.Model):
                 name='unique_sale_product_per_sale'
             )
         ]
-
-    def save(self, *args, **kwargs):
-        self.line_total = self.unit_price * self.quantity
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} @ {self.unit_price}"
