@@ -40,9 +40,10 @@ INSTALLED_APPS = [
     
     'rest_framework',
 
-    #apps
+    # Apps
     'apps.products',
     'apps.users',
+    'apps.sales',
 ]
 
 AUTH_USER_MODEL = 'users.manageUser'
