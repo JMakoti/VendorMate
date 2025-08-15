@@ -26,9 +26,11 @@ SECRET_KEY = 'django-insecure-6v%4%48-5=m)qh07vki4_d#ols$j-ib__h!_zx=fshkf4q2ki3
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
-# Application definition
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,15 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'rest_framework',
 
     #apps
     'apps.products',
     'apps.users',
+    'apps.users',
 ]
 
-AUTH_USER_MODEL = 'users.manageUser'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
