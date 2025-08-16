@@ -2,7 +2,12 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from pathlib import Path
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Add the apps directory to the Python path
+sys.path.insert(0, str(BASE_DIR / 'apps'))
 
 def main():
     """Run administrative tasks."""
@@ -17,6 +22,6 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-
+    
 if __name__ == '__main__':
     main()
