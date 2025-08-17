@@ -26,11 +26,6 @@ SECRET_KEY = 'django-insecure-6v%4%48-5=m)qh07vki4_d#ols$j-ib__h!_zx=fshkf4q2ki3
 DEBUG = True
 
 ALLOWED_HOSTS = []
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,14 +36,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework_simplejwt',
 
     # Apps
     'apps.products',
     'apps.users',
-    'apps.payments'
+    'apps.payments',
     'apps.sales',
 ]
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
