@@ -15,7 +15,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
-class Products(models.Model):
+class Product(models.Model):
     """Product Model"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     category = models.ForeignKey(Category, related_name="products", on_delete=models.SET_NULL, null=True)
@@ -34,6 +34,7 @@ class Products(models.Model):
         verbose_name_plural = "Products"
 
     def __str__(self):
-        return self.name
+        return f"{self.category.name} - {self.name}"
 
-        
+# Keep Products as alias for backward compatibility
+Products = Product
