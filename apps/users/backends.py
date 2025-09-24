@@ -1,14 +1,17 @@
+import logging
 from django.contrib.auth.backends import ModelBackend
-from .models import manageUser
+from django.contrib.auth.models import User
+
+logger = logging.getLogger(__name__)
 
 class EmailBackend(ModelBackend):
     def authenticate(self, request, email=None, password=None, **kwargs):
-        print(f"Authenticating: {email}")
+        logger.debug("Email authentication attempt")
         if email is None or password is None:
             return None
         try:
-            user = manageUser.objects.get(email=email)
+            user = User.objects.get(email=email)
             if user.check_password(password):
                 return user
-        except manageUser.DoesNotExist:
+        except User.DoesNotExist:
             return None

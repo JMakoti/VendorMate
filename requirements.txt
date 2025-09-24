@@ -1,5 +1,16 @@
 asgiref==3.9.1
-Django==5.2.5
+certifi==2025.8.3
+charset-normalizer==3.4.3
+Django==5.2.6
 djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
+drf-spectacular==0.27.2
+psycopg[binary]==3.2.3  # Only needed for production (DEBUG=False)
+dotenv==0.9.9
+idna==3.10
 pillow==11.3.0
+PyJWT==2.10.1
+python-dotenv==1.1.1
+requests==2.32.4
 sqlparse==0.5.3
+urllib3==2.5.0

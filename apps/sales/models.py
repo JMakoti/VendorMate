@@ -1,5 +1,6 @@
 from decimal import Decimal
 from django.db import models
+from django.conf import settings
 
 class Sale(models.Model):
     STATUS_CHOICES = [
@@ -8,7 +9,7 @@ class Sale(models.Model):
         ('CANCELLED', 'Cancelled'),
     ]
     
-    vendor = models.ForeignKey('users.User', on_delete=models.PROTECT)
+    vendor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default='PENDING')
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     payment_reference = models.CharField(max_length=255, null=True, blank=True, unique=True)
@@ -25,12 +26,12 @@ class Sale(models.Model):
         ]
 
     def __str__(self):
-        return f"Sale {self.id} ({self.status})"
+        return f"Sale {self.id or 'New'} ({self.status})"
 
 
 class SaleItem(models.Model):
     sale = models.ForeignKey('sales.Sale', on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('products.Products', on_delete=models.PROTECT)
+    product = models.ForeignKey('products.Product', on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     line_total = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal('0.00'))
@@ -65,11 +66,14 @@ class SaleEvent(models.Model):
     ]
 
     sale = models.ForeignKey('sales.Sale', on_delete=models.CASCADE)
-    actor = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.SET_NULL)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     event_type = models.CharField(max_length=32, choices=EVENT_TYPE_CHOICES)
     payload = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"Event for Sale {self.sale.id}: {self.event_type}"

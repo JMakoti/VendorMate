@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from apps.products.models import Products
+from apps.products.models import Product
 from .models import Sale, SaleItem, SaleEvent
 from django.db import transaction
 from decimal import Decimal
+from django.utils.html import escape
 
 class SaleItemSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Products.objects.all())
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
 
     class Meta:
         model = SaleItem
@@ -24,6 +25,8 @@ class SaleItemSerializer(serializers.ModelSerializer):
 
         if unit_price is not None and unit_price < Decimal('0.00'):
             raise serializers.ValidationError({'unit_price': 'Unit price cannot be negative.'})
+        
+        return data
 
     def create(self, validated_data):
         unit_price = validated_data.get('unit_price')
@@ -53,13 +56,13 @@ class SaleSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         items_data = validated_data.pop('items')
-        vendor = validated_data.pop('vendor')
+        # vendor = validated_data.pop('vendor')
         product_ids = [item['product'].id for item in items_data]
 
         # Atomic transaction - Prevents partially created sales
         with transaction.atomic():
             # Acquire locks on product rows
-            products_qs = Products.objects.select_for_update().filter(id__in=product_ids)
+            products_qs = Product.objects.select_for_update().filter(id__in=product_ids)
             products_map = {prod.id: prod for prod in products_qs}
 
             # Stock validation
@@ -100,7 +103,7 @@ class SaleSerializer(serializers.ModelSerializer):
                 total += line_total
 
             SaleItem.objects.bulk_create(sale_items)
-            Products.objects.bulk_update(products_to_update, ['stock'])
+            Product.objects.bulk_update(products_to_update, ['stock'])
             sale.total_amount = total
             sale.save(update_fields=['total_amount'])
 
@@ -109,7 +112,7 @@ class SaleSerializer(serializers.ModelSerializer):
                 sale=sale,
                 event_type='CREATED',
                 payload={'total': str(total)},
-                actor=vendor
+                actor=sale.vendor
             )
 
             return sale

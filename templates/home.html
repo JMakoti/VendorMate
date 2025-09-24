@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorMate API - Your Vendor Management Companion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .header { text-align: center; color: white; margin-bottom: 3rem; }
+        .header h1 { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+        .card { background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { color: #333; margin-bottom: 1rem; font-size: 1.5rem; }
+        .card p { color: #666; margin-bottom: 1.5rem; line-height: 1.6; }
+        .btn { display: inline-block; padding: 12px 24px; background: #667eea; color: white; text-decoration: none; border-radius: 8px; transition: background 0.3s ease; font-weight: 500; }
+        .btn:hover { background: #5a6fd8; }
+        .btn-secondary { background: #764ba2; }
+        .btn-secondary:hover { background: #6a4190; }
+        .endpoints { background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .endpoints h3 { color: #333; margin-bottom: 1.5rem; }
+        .endpoint-group { margin-bottom: 2rem; }
+        .endpoint-group h4 { color: #667eea; margin-bottom: 1rem; }
+        .endpoint { background: #f8f9fa; padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: 5px; font-family: monospace; }
+        .method { color: #28a745; font-weight: bold; }
+        .footer { text-align: center; color: white; margin-top: 3rem; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 VendorMate API</h1>
+            <p>Your comprehensive vendor management platform</p>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h3>📚 Swagger UI</h3>
+                <p>Interactive API documentation with live testing capabilities. Explore endpoints, view request/response schemas, and test API calls directly from your browser.</p>
+                <a href="/api/docs/" class="btn">Open Swagger UI</a>
+            </div>
+
+            <div class="card">
+                <h3>📖 ReDoc</h3>
+                <p>Clean, responsive API documentation with a focus on readability. Perfect for understanding API structure and integration requirements.</p>
+                <a href="/api/redoc/" class="btn btn-secondary">Open ReDoc</a>
+            </div>
+
+            <div class="card">
+                <h3>⚙️ OpenAPI Schema</h3>
+                <p>Raw OpenAPI 3.0 schema in JSON format. Import into tools like Postman, Insomnia, or other API clients for testing and development.</p>
+                <a href="/api/schema/" class="btn">Download Schema</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built with Django REST Framework | Powered by VendorMate Team</p>
+        </div>
+    </div>
+</body>
+</html>

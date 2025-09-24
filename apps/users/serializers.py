@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import *
+from .models import Profile
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -20,7 +20,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ['id', 'user', 'gender', 'company_name', 'company_address', 'username']
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
